@@ -1,0 +1,175 @@
+CREATE TABLE ip_data_device (device_id, ip, ip_freq_count, idxip_anonymous_c1, idxip_anonymous_c2, idxip_anonymous_c3, idxip_anonymous_c4, idxip_anonymous_c5);
+
+Select count(*) from id_ips where device_or_cookie_indicator="0";
+
+
+
+Insert into ip_data_device (device_id, ip, ip_freq_count, idxip_anonymous_c1, idxip_anonymous_c2, idxip_anonymous_c3, idxip_anonymous_c4, idxip_anonymous_c5)
+Select device_or_cookie_id, ip, ip_freq_count, idxip_anonymous_c1, idxip_anonymous_c2, idxip_anonymous_c3, idxip_anonymous_c4, idxip_anonymous_c5 from id_ips where device_or_cookie_indicator = '0';
+
+Select count(*) from devices;
+
+
+CREATE TABLE ip_data_cookie (cookie_id, ip, ip_freq_count, idxip_anonymous_c1, idxip_anonymous_c2, idxip_anonymous_c3, idxip_anonymous_c4, idxip_anonymous_c5);
+
+
+Insert into ip_data_cookie (cookie_id, ip, ip_freq_count, idxip_anonymous_c1, idxip_anonymous_c2, idxip_anonymous_c3, idxip_anonymous_c4, idxip_anonymous_c5)
+
+Select device_or_cookie_id, ip, ip_freq_count, idxip_anonymous_c1, idxip_anonymous_c2, idxip_anonymous_c3, idxip_anonymous_c4, idxip_anonymous_c5 from id_ips where device_or_cookie_indicator = '1';
+
+
+Select * from devices where device_type not in ('-1','devtype_1', 'devtype_2', 'devtype_3', 'devtype_4', 'devtype_5', 'devtype_6', 'devtype_7');
+
+Select * from ip_data_device a join id_ips b on a.device_id = b.device_cookie_id;
+
+/*Join device table with newly created ip_device maping table*/
+
+
+Select b.device_id, b.device_type, b.device_os, b.country, b.anonymous_c0, b.anonymous_c1, b.anonymous_c2, b.anonymous_5, b.anonymous_6, b.anonymous_7, a.ip, a.ip_freq_count, a.idxip_anonymous_c1, a.idxip_anonymous_c2, a.idxip_anonymous_c3, a.idxip_anonymous_c4, a.idxip_anonymous_c5, b.drawbridge_handle from ip_data_device a left join devices b on b.device_id = a.device_id; 
+
+
+
+
+Select * from ip_data_cookie;
+
+
+/*Join cookies table with newly created ip_cookie maping table*/
+
+Select a.drawbridge_handle, a.cookie_id, a.computer_os_type, a.browser_version, a.country, a.anonymous_c0, a.anonymous_c1, a.anonymous_c2, a.anonymous_5, a.anonymous_6, a.anonymous_7, b.ip, b.ip_freq_count, b.idxip_anonymous_c1, b.idxip_anonymous_c2, b.idxip_anonymous_c3, b.idxip_anonymous_c4, b.idxip_anonymous_c5 from cookies a join ip_data_cookie b on a.cookie_id = b.cookie_id;
+
+
+
+CREATE TABLE devices (drawbridge_handle, device_id PRIMARY KEY, device_type, device_os, country, anonymous_c0, anonymous_c1, anonymous_c2, anonymous_5, anonymous_6, anonymous_7);
+
+
+/*Create table that relates devics and Ip addresses*/
+
+Create Table device_ip_join (drawbridge_handle varchar(40), device_id varchar(30), device_type varchar(30), device_os varchar(30), country varchar(30), ip varchar(30), ip_freq_count varchar(30), anonymous_c0 varchar(30), anonymous_c1 varchar(30), anonymous_c2 varchar(30), anonymous_5 varchar(30), anonymous_6 varchar(30), anonymous_7 varchar(30), idxip_anonymous_c1 varchar(30), idxip_anonymous_c2 varchar(30), idxip_anonymous_c3 varchar(30), idxip_anonymous_c4 varchar(30), idxip_anonymous_c5 varchar(30));
+
+
+/*Create table that relates cookies and Ip addresses*/
+
+
+Create Table cookie_ip_join (drawbridge_handle, cookie_id, computer_os_type, browser_version, country, anonymous_c0, anonymous_c1, anonymous_c2, anonymous_5, anonymous_6, anonymous_7);
+
+
+
+Insert into device_ip_join
+Select b.drawbridge_handle, b.device_id, b.device_type, b.device_os, b.country, a.ip, a.ip_freq_count, b.anonymous_c0, b.anonymous_c1, b.anonymous_c2, b.anonymous_5, b.anonymous_6, b.anonymous_7, a.idxip_anonymous_c1, a.idxip_anonymous_c2, a.idxip_anonymous_c3, a.idxip_anonymous_c4, a.idxip_anonymous_c5 from ip_data_device a left join devices b on b.device_id = a.device_id; 
+ 
+Select * from device_ip_join;
+
+
+Insert into cookie_ip_join 
+Select a.drawbridge_handle, a.cookie_id, a.computer_os_type, a.browser_version, a.country, a.anonymous_c0, a.anonymous_c1, a.anonymous_c2, a.anonymous_5, a.anonymous_6, a.anonymous_7, b.ip, b.ip_freq_count, b.idxip_anonymous_c1, b.idxip_anonymous_c2, b.idxip_anonymous_c3, b.idxip_anonymous_c4, b.idxip_anonymous_c5 from cookies a join ip_data_cookie b on a.cookie_id = b.cookie_id;
+
+
+Create Table cookie_device_ip (drawbridge_handle varchar(40), cookie_or_device_id varchar(30), cookie_device_indicator boolean, device_type varchar(30), device_computer_os_type varchar(30), browser_version varchar(30), device_cookie_country varchar(30), ip varchar(30), ip_freq_count varchar(30), anonymous_c0 varchar(30), anonymous_c1 varchar(30), anonymous_c2 varchar(30), anonymous_5 varchar(30), anonymous_6 varchar(30), anonymous_7 varchar(30), idxip_anonymous_c1 varchar(30), idxip_anonymous_c2 varchar(30), idxip_anonymous_c3 varchar(30), idxip_anonymous_c4 varchar(30), idxip_anonymous_c5 varchar(30));
+
+
+Insert into cookie_device_ip (drawbridge_handle, cookie_or_device_id, device_computer_os_type, browser_version, device_cookie_country, anonymous_c0, anonymous_c1, anonymous_c2, anonymous_5, anonymous_6, anonymous_7, ip, ip_freq_count, idxip_anonymous_c1, idxip_anonymous_c2, idxip_anonymous_c3, idxip_anonymous_c4, idxip_anonymous_c5) 
+Select * from cookie_ip_join;
+
+
+Select * from cookie_device_ip limit 50;
+
+Update cookie_device_ip Set cookie_device_indicator = 1;
+
+
+Insert into cookie_device_ip (drawbridge_handle, cookie_or_device_id, device_type, device_computer_os_type, device_cookie_country, ip, ip_freq_count, anonymous_c0, anonymous_c1, anonymous_c2, anonymous_5, anonymous_6, anonymous_7, idxip_anonymous_c1, idxip_anonymous_c2, idxip_anonymous_c3, idxip_anonymous_c4, idxip_anonymous_c5) 
+
+Select * from device_ip_join;
+
+
+Update cookie_device_ip Set cookie_device_indicator = 0 where cookie_device_indicator is not 1 ;
+
+
+Create Table device_cookie (drawbridge_handle varchar(40), device_id varchar(30), device_type varchar(30), device_os varchar(30), country varchar(30),  anonymous_c0 varchar(30), anonymous_c1 varchar(30), anonymous_c2 varchar(30), anonymous_5 varchar(30), anonymous_6 varchar(30), anonymous_7 varchar(30), drawbridge_handle_cookie varchar(40), cookie_id varchar(30), computer_os_type varchar(30), browser_version varchar(30), cookie_country varchar(30), anonymous_c0_ck varchar(30), anonymous_c1_ck varchar(30), 
+anonymous_c2_ck varchar(30), anonymous_5_ck varchar(30), anonymous_6_ck varchar(30), anonymous_7_ck varchar(30));
+
+Drop table device_cookie;
+
+Insert into device_cookie (drawbridge_handle, device_id, device_type, device_os, country,  anonymous_c0, anonymous_c1, anonymous_c2, anonymous_5, anonymous_6, anonymous_7, drawbridge_handle_cookie, cookie_id, computer_os_type, browser_version, cookie_country, anonymous_c0_ck, anonymous_c1_ck, anonymous_c2_ck, anonymous_5_ck, anonymous_6_ck, anonymous_7_ck) 
+Select * from devices d join cookies c on d.drawbridge_handle = c.drawbridge_handle limit 10000; 
+
+Select drawbridge_handle, cookie_id, device_id from device_cookie;
+
+
+Select a.device_or_cookie_id, a.device_or_cookie_indicator, a.ip, a.ip_freq_count, b.device_or_cookie_id, b.device_or_cookie_indicator, b.ip, b.ip_freq_count from id_ips a join id_ips b on a.ip = b.ip AND a.device_or_cookie_id != b.device_or_cookie_id limit 100;
+
+
+Select * from id_properties where device_or_cookie_id = '-1';
+
+Create table device_cookie (drawbridge_handle varchar(25), device_id varchar(25), device_type varchar(25),device_os varchar(25), cookie_id varchar(25), computer_os_type varchar(25), browser_version varchar(25), country varchar(25));
+
+Insert into device_cookie
+Select d.drawbridge_handle, d.device_id, d.device_type, d.device_os, c.cookie_id, c.computer_os_type, c.browser_version, c.country from devices d, cookies c where d.drawbridge_handle = c.drawbridge_handle AND d.drawbridge_handle != '-1' AND c.drawbridge_handle != '-1' limit 2000000;
+
+
+Select * from device_cookie where flag is 0;
+
+Select d.drawbridge_handle, d.device_id, c.cookie_id from devices d, cookies c where d.country=c.country AND d.drawbridge_handle=c.drawbridge_handle AND d.drawbridge_handle != '-1' AND c.drawbridge_handle != '-1';
+
+Select count(d.drawbridge_handle) from devices d, cookies c where d.drawbridge_handle != c.drawbridge_handle; 
+
+/*Negative training data*/
+Select d.drawbridge_handle, d.device_id, d.device_type, d.device_os, c.drawbridge_handle, c.cookie_id, c.computer_os_type, c.browser_version, c.country from devices d, cookies c where d.drawbridge_handle != c.drawbridge_handle AND d.drawbridge_handle != '-1' AND c.drawbridge_handle != '-1' limit 2000000;
+
+/* Flag indiactes that each row represents a matching device cookie pair */
+Alter table device_cookie add column flag Integer;
+Update device_cookie set flag = 1;
+
+Select distinct(device_id) from devices where drawbridge_handle == '-1';
+
+Drop table test_data;
+
+Create table test_data (drawbridge_handle varchar(25), device_id varchar(25), device_type varchar(25),device_os varchar(25), cookie_id varchar(25), computer_os_type varchar(25), browser_version varchar(25), country varchar(25));
+
+Select *  from test_data;
+
+
+
+Drop table test_actual;
+
+Create table test_actual (device_id varchar(25), device_type varchar(25),device_os varchar(25), cookie_id varchar(25), computer_os_type varchar(25), browser_version varchar(25), country varchar(25));
+
+/* this selects random 5336 samples from cookies*/
+Insert into test_actual (cookie_id, computer_os_type, browser_version, country)
+Select cookie_id, computer_os_type, browser_version, country from cookies where drawbridge_handle = '-1' and random() % 100 = 0; 
+
+Insert into test_actual (cookie_id, computer_os_type, browser_version, country)
+Select cookie_id, computer_os_type, browser_version, country from cookies where drawbridge_handle = '-1'; 
+
+
+/*Select cookie_id, computer_os_type, browser_version, country from cookies where random() % 100 = 0 limit 100;
+
+Select * from test_actual;
+
+Select distinct(cookie_id) from test_actual;
+
+Update test_actual set device_id = (Select device_id from test_data limit 1), device_type = (Select device_type from test_data limit 1), device_os = (Select device_os from test_data limit 1) 
+where device_id is NULL;
+
+/* Create negative training data table*/
+
+Create table neg_train (drawbridge_handle varchar(25), device_id varchar(25), device_type varchar(25),device_os varchar(25), drawbridge_handle_cookie varchar(25), cookie_id varchar(25), computer_os_type varchar(25), browser_version varchar(25), country varchar(25));
+
+Drop table neg_train;
+
+Select * from neg_train;
+
+Insert into neg_train
+select *
+from 
+    (select drawbridge_handle, device_id, device_type, device_os from devices where drawbridge_handle != '-1' and random() % 100 = 0 limit 200) d,
+    (select drawbridge_handle, cookie_id, computer_os_type, browser_version, country from cookies where drawbridge_handle != '-1' and random() % 100 = 0 limit 1000) c
+where d.drawbridge_handle != c.drawbridge_handle;
+
+Insert into device_cookie (drawbridge_handle, device_id, cookie_id, device_type, device_os, computer_os_type, browser_version, country)
+Select drawbridge_handle, device_id, cookie_id, device_type, device_os, computer_os_type, browser_version, country from neg_train;
+
+Delete from device_cookie where flag = 0;
+
+Update device_cookie set flag = 0 where flag is NULL;
+
+Select count(*) from cookies where drawbridge_handle = '-1';
